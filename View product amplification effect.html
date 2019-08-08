@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>原生JS-实现京东商品点击放大案例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .box {
+            width: 450px;
+            height: 450px;
+            border: 1px solid #aaa;
+            position: relative;
+            top: 100px;
+            left: 100px;
+        }
+        
+        .small {
+            width: 450px;
+            height: 450px;
+            position: absolute;
+        }
+        
+        .mask {
+            position: absolute;
+            background-color: rgba(255, 255, 0, .3);
+            /* border: 1px solid #ff0; */
+            width: 225px;
+            height: 225px;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+        
+        .big {
+            width: 450px;
+            height: 450px;
+            border: 1px solid #aaa;
+            position: absolute;
+            left: 500px;
+            top: 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .big>img {
+            width: 900px;
+            height: 900px;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <!--  -->
+        <div class="small">
+            <img src="./images/s.jpg" alt="">
+            <div class="mask"></div>
+        </div>
+        <!--  -->
+        <div class="big">
+            <img src="./images/big.jpg" alt="">
+        </div>
+    </div>
+</body>
+<script>
+    //一步一步来，不慌
+    //首先来个onload事件，等待页面加载完在执行，
+    window.onload = function() {
+        //获取DOM一波 用到什么拿什么
+        var small = document.querySelector(".small");
+        var box = document.querySelector(".box");
+        var big = document.querySelector(".big");
+        var mask = document.querySelector(".mask");
+        var bigimg = document.querySelector(".big img");
+
+        // 第一部分 -----------------------------------------------开始
+        //分析一下 我们第一步要做的事情就是鼠标移入，移除的操作
+        //在分析鼠标移入会怎么样子呢？
+        //鼠标移入会有黄色透明框框的显示，以及大图的显示
+        small.onmouseover = function() {
+            big.style.display = "block";
+            mask.style.display = "block";
+        };
+        //在分析鼠标移出会怎么样子呢？
+        //鼠标移入会有黄色透明框框的隐藏，以及大图的隐藏
+        small.onmouseout = function() {
+            big.style.display = "none";
+            mask.style.display = "none";
+        };
+        // 第一部分 -----------------------------------------------结束
+
+        // 第二部分 -----------------------------------------------开始
+        //我们需要将鼠标在黄色的透明框的中间显示
+        small.onmousemove = function(e) {
+                var x = e.pageX - box.offsetLeft - mask.offsetWidth / 2;
+                var y = e.pageY - box.offsetTop - mask.offsetHeight / 2;
+                console.log(x, y);
+                //获取 左面小图的max值
+                var max_x = small.clientWidth - mask.offsetWidth;
+                var max_y = small.clientHeight - mask.offsetHeight;
+                //获取 右面大图的max值
+                var MAX_X = bigimg.offsetWidth - big.clientWidth;
+                var MAX_Y = bigimg.offsetHeight - big.clientHeight;
+
+                //设置这个黄色的框框在这个盒子里面的最大移动区域
+                //左面/上面 设置
+                if (x < 0) {
+                    x = 0;
+                }
+                if (y < 0) {
+                    y = 0;
+                }
+                //右面/下面 设置
+                if (x > max_x) {
+                    x = max_x;
+                }
+                if (y > max_y) {
+                    y = max_y;
+                }
+
+                mask.style.left = `${x}px`;
+                mask.style.top = `${y}px`;
+
+
+                //这里运用到了数学中的等比的概念，因为查看的图要比现在看到的大，所以等比例增大
+                var X = x / max_x * MAX_X;
+                var Y = y / max_y * MAX_Y
+
+
+                //到了这里，咱们已经将最大，最小的临界点已经获取完毕
+                //现在给右面的大图进行定位移动即可
+                bigimg.style.left = `-${X}px`;
+                bigimg.style.top = `-${Y}px`;
+
+
+            }
+            // 第二部分 -----------------------------------------------结束
+
+
+
+
+
+    }
+</script>
+
+</html>
